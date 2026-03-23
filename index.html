@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuidador Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app-wrapper">
+
+    <header class="topo">
+        <div class="topo-esq">
+            <span class="saudacao" id="saudacao">Bom dia,</span>
+            <h1 class="nome-paciente">Maria Silva</h1>
+        </div>
+        <span class="data-pill" id="data-hoje">--/--/----</span>
+    </header>
+
+    <nav class="nav-abas">
+        <button class="aba aba-ativa" id="aba-agua" onclick="mudarAba('agua')">
+            <span class="aba-icone">💧</span>
+            <span>Hidratação</span>
+        </button>
+        <button class="aba" id="aba-med" onclick="mudarAba('med')">
+            <span class="aba-icone">💊</span>
+            <span>Medicamentos</span>
+        </button>
+    </nav>
+
+    <!-- TELA ÁGUA -->
+    <div id="tela-agua" class="tela">
+
+        <section class="hero-agua">
+            <div class="copo-visual">
+                <div class="copo-fill" id="copo-fill"></div>
+                <div class="copo-ondas" id="copo-ondas">
+                    <div class="onda onda1"></div>
+                    <div class="onda onda2"></div>
+                </div>
+                <div class="copo-borda"></div>
+                <div class="copo-texto">
+                    <span class="copo-litros" id="copo-litros">0,0 L</span>
+                    <span class="copo-meta-label">de <span id="meta-label">2,0</span> L</span>
+                </div>
+            </div>
+            <p class="progresso-texto" id="copos-texto">0 de 8 copos hoje</p>
+        </section>
+
+        <section class="card-timer">
+            <div class="timer-header">
+                <span class="timer-label">Próximo lembrete em</span>
+                <button class="chip-btn" onclick="abrirModal('modal-config-agua')">⚙ Ajustar</button>
+            </div>
+            <div class="timer-ring-wrapper">
+                <svg class="timer-ring" viewBox="0 0 120 120">
+                    <circle class="ring-bg" cx="60" cy="60" r="52"/>
+                    <circle class="ring-prog ring-azul" cx="60" cy="60" r="52" id="ring-agua"/>
+                </svg>
+                <div class="timer-display">
+                    <span class="timer-num" id="timer-agua-num">60</span>
+                    <span class="timer-unit">min</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="historico-section">
+            <div class="sec-header-row">
+                <h2 class="sec-titulo">Copos de hoje</h2>
+                <span class="sec-sub" id="historico-sub">Nenhum registro</span>
+            </div>
+            <div class="copos-grid" id="copos-grid"></div>
+        </section>
+
+        <div class="acoes-fixas">
+            <button class="btn-primario btn-azul" id="btn-agua" onclick="registrarAgua()">
+                <span class="btn-ico">💧</span>
+                <span id="btn-agua-label">Bebi água agora</span>
+            </button>
+        </div>
+
+    </div>
+
+    <!-- TELA MEDICAMENTOS -->
+    <div id="tela-med" class="tela" style="display:none">
+
+        <section class="resumo-med">
+            <div class="resumo-card">
+                <span class="resumo-num" id="res-tomados">0</span>
+                <span class="resumo-label">Tomados</span>
+            </div>
+            <div class="resumo-sep"></div>
+            <div class="resumo-card">
+                <span class="resumo-num resumo-pendente" id="res-pendentes">0</span>
+                <span class="resumo-label">Pendentes</span>
+            </div>
+            <div class="resumo-sep"></div>
+            <div class="resumo-card">
+                <span class="resumo-num resumo-pulados" id="res-pulados">0</span>
+                <span class="resumo-label">Pulados</span>
+            </div>
+        </section>
+
+        <div class="sec-header-row" style="padding: 0 24px; margin-bottom: 12px;">
+            <h2 class="sec-titulo">Agenda do dia</h2>
+            <button class="chip-btn chip-verde" onclick="abrirModal('modal-add-med')">+ Adicionar</button>
+        </div>
+
+        <div class="med-lista" id="med-lista"></div>
+
+        <div class="acoes-fixas">
+            <button class="btn-primario btn-verde" onclick="abrirModal('modal-add-med')">
+                <span class="btn-ico">💊</span>
+                <span>Adicionar medicamento</span>
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- MODAL: Alerta Água -->
+<div class="modal-overlay" id="modal-alerta-agua">
+    <div class="modal-card">
+        <div class="modal-icone-wrap modal-icone-azul">💧</div>
+        <h2 class="modal-titulo">Hora de beber água!</h2>
+        <p class="modal-msg">Já faz <span id="modal-tempo-agua">60</span> minutos.<br>Hidratação é saúde!</p>
+        <div class="modal-acoes">
+            <button class="btn-primario btn-azul" onclick="registrarAguaModal()">Bebi agora!</button>
+            <button class="btn-secundario" onclick="adiarAguaAlerta()">Lembrar em 10 min</button>
+        </div>
+        <div class="aviso-familiar" id="aviso-familiar-agua" style="display:none">
+            ⚠️ Familiar notificado pela demora
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Alerta Medicamento -->
+<div class="modal-overlay" id="modal-alerta-med">
+    <div class="modal-card">
+        <div class="modal-icone-wrap modal-icone-verde">💊</div>
+        <h2 class="modal-titulo" id="modal-med-nome">Medicamento</h2>
+        <p class="modal-msg" id="modal-med-detalhe">Dose — instrução</p>
+        <div class="pill-info-row">
+            <div class="pill-info"><span class="pill-val" id="modal-med-hora">--:--</span><span class="pill-lbl">Horário</span></div>
+            <div class="pill-info"><span class="pill-val" id="modal-med-periodo">--</span><span class="pill-lbl">Período</span></div>
+        </div>
+        <div class="modal-acoes">
+            <button class="btn-primario btn-verde" onclick="confirmarMed()">Tomei agora!</button>
+            <button class="btn-secundario" onclick="adiarMed()">Adiar 10 minutos</button>
+            <button class="btn-pular" onclick="pularMed()">Pular este horário</button>
+        </div>
+        <div class="aviso-familiar" id="aviso-familiar-med" style="display:none">
+            ⚠️ Familiar notificado
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Config Água -->
+<div class="modal-overlay" id="modal-config-agua">
+    <div class="modal-card">
+        <h2 class="modal-titulo">Configurar hidratação</h2>
+        <div class="config-grupo">
+            <label class="config-label">Meta diária</label>
+            <div class="config-opts">
+                <button class="config-opt" data-meta="1.5" onclick="setMeta(this)">1,5 L</button>
+                <button class="config-opt config-opt-on" data-meta="2.0" onclick="setMeta(this)">2,0 L</button>
+                <button class="config-opt" data-meta="2.5" onclick="setMeta(this)">2,5 L</button>
+                <button class="config-opt" data-meta="3.0" onclick="setMeta(this)">3,0 L</button>
+            </div>
+        </div>
+        <div class="config-grupo">
+            <label class="config-label">Intervalo dos lembretes</label>
+            <div class="config-opts">
+                <button class="config-opt" data-int="30" onclick="setIntervalo(this)">30 min</button>
+                <button class="config-opt config-opt-on" data-int="60" onclick="setIntervalo(this)">60 min</button>
+                <button class="config-opt" data-int="90" onclick="setIntervalo(this)">90 min</button>
+                <button class="config-opt" data-int="120" onclick="setIntervalo(this)">2 h</button>
+            </div>
+        </div>
+        <div class="config-grupo">
+            <label class="config-label">Avisar familiar após</label>
+            <div class="config-opts">
+                <button class="config-opt" data-atraso="1" onclick="setAtraso(this)">1 atraso</button>
+                <button class="config-opt config-opt-on" data-atraso="2" onclick="setAtraso(this)">2 atrasos</button>
+                <button class="config-opt" data-atraso="3" onclick="setAtraso(this)">3 atrasos</button>
+            </div>
+        </div>
+        <button class="btn-primario btn-azul" onclick="fecharModal('modal-config-agua')">Salvar</button>
+    </div>
+</div>
+
+<!-- MODAL: Adicionar Medicamento -->
+<div class="modal-overlay" id="modal-add-med">
+    <div class="modal-card">
+        <h2 class="modal-titulo">Novo medicamento</h2>
+        <div class="form-campo">
+            <label class="config-label">Nome</label>
+            <input type="text" id="novo-med-nome" placeholder="Ex: Losartana" class="campo-input">
+        </div>
+        <div class="form-campo">
+            <label class="config-label">Dose</label>
+            <input type="text" id="novo-med-dose" placeholder="Ex: 50mg — 1 comprimido" class="campo-input">
+        </div>
+        <div class="form-campo">
+            <label class="config-label">Instrução</label>
+            <input type="text" id="novo-med-inst" placeholder="Ex: Tomar com água" class="campo-input">
+        </div>
+        <div class="form-campo">
+            <label class="config-label">Horário</label>
+            <input type="time" id="novo-med-hora" class="campo-input">
+        </div>
+        <div class="config-grupo">
+            <label class="config-label">Período</label>
+            <div class="config-opts">
+                <button class="config-opt config-opt-on" data-periodo="Manhã" onclick="setPeriodo(this)">Manhã</button>
+                <button class="config-opt" data-periodo="Tarde" onclick="setPeriodo(this)">Tarde</button>
+                <button class="config-opt" data-periodo="Noite" onclick="setPeriodo(this)">Noite</button>
+            </div>
+        </div>
+        <div class="modal-acoes">
+            <button class="btn-primario btn-verde" onclick="adicionarMed()">Salvar</button>
+            <button class="btn-secundario" onclick="fecharModal('modal-add-med')">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Confirmação -->
+<div class="modal-overlay" id="modal-ok">
+    <div class="modal-card modal-ok-card">
+        <div class="ok-circulo">✓</div>
+        <h2 class="modal-titulo" id="ok-titulo">Registrado!</h2>
+        <p class="modal-msg" id="ok-msg">Tudo certo.</p>
+        <button class="btn-primario btn-verde" onclick="fecharModal('modal-ok')">Entendido!</button>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
