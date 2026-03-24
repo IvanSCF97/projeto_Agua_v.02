@@ -18,7 +18,13 @@
             <span class="saudacao" id="saudacao">Bom dia,</span>
             <h1 class="nome-paciente">Maria Silva</h1>
         </div>
-        <span class="data-pill" id="data-hoje">--/--/----</span>
+        <div class="topo-dir">
+            <button class="btn-diario" onclick="abrirModal('modal-diario')" title="Diário de saúde">
+                <span class="btn-diario-ico">📋</span>
+                <span class="btn-diario-txt">Diário</span>
+            </button>
+            <span class="data-pill" id="data-hoje">--/--/----</span>
+        </div>
     </header>
 
     <nav class="nav-abas">
@@ -105,7 +111,7 @@
             </div>
         </section>
 
-        <div class="sec-header-row" style="padding: 0 24px; margin-bottom: 12px;">
+        <div class="sec-header-row" style="padding:0 24px;margin-bottom:12px;">
             <h2 class="sec-titulo">Agenda do dia</h2>
             <button class="chip-btn chip-verde" onclick="abrirModal('modal-add-med')">+ Adicionar</button>
         </div>
@@ -123,6 +129,146 @@
 
 </div>
 
+<!-- ============================================================ -->
+<!-- MODAL DIÁRIO DE SAÚDE (tela cheia)                          -->
+<!-- ============================================================ -->
+<div class="modal-overlay modal-fullscreen" id="modal-diario">
+    <div class="modal-diario-card">
+
+        <div class="diario-header">
+            <div>
+                <h2 class="diario-titulo">Diário de saúde</h2>
+                <span class="diario-sub">Maria Silva</span>
+            </div>
+            <button class="btn-fechar" onclick="fecharModal('modal-diario')">✕</button>
+        </div>
+
+        <!-- ABAS DO DIÁRIO -->
+        <div class="diario-abas">
+            <button class="d-aba d-aba-ativa" id="d-aba-pressao" onclick="mudarDiarioAba('pressao')">Pressão</button>
+            <button class="d-aba" id="d-aba-glicemia" onclick="mudarDiarioAba('glicemia')">Glicemia</button>
+        </div>
+
+        <!-- PAINEL PRESSÃO -->
+        <div id="d-tela-pressao" class="d-tela">
+
+            <!-- Cards de último valor -->
+            <div class="d-metricas">
+                <div class="d-metrica-card" id="d-pressao-status-card">
+                    <span class="d-metrica-label">Última medição</span>
+                    <span class="d-metrica-val" id="d-pressao-ultima">--/-- mmHg</span>
+                    <span class="d-metrica-badge" id="d-pressao-badge">—</span>
+                </div>
+                <div class="d-metrica-card">
+                    <span class="d-metrica-label">Registros hoje</span>
+                    <span class="d-metrica-val" id="d-pressao-hoje">0</span>
+                    <span class="d-metrica-badge d-badge-neutro">medições</span>
+                </div>
+            </div>
+
+            <!-- Alerta de valor anormal -->
+            <div class="d-alerta" id="d-alerta-pressao" style="display:none"></div>
+
+            <!-- Gráfico -->
+            <div class="d-grafico-wrap">
+                <div class="d-grafico-titulo">Evolução — últimos 7 dias</div>
+                <div class="d-grafico-area">
+                    <canvas id="grafico-pressao"></canvas>
+                </div>
+            </div>
+
+            <!-- Histórico -->
+            <div class="d-historico-header">
+                <span class="d-historico-titulo">Histórico</span>
+                <span class="sec-sub" id="d-pressao-total">0 registros</span>
+            </div>
+            <div class="d-historico-lista" id="d-pressao-lista"></div>
+
+            <!-- Form de registro -->
+            <div class="d-form-card">
+                <div class="d-form-titulo">Registrar medição</div>
+                <div class="d-form-row">
+                    <div class="form-campo">
+                        <label class="config-label">Sistólica (mmHg)</label>
+                        <input type="number" id="p-sistolica" placeholder="120" class="campo-input" min="60" max="250">
+                    </div>
+                    <div class="form-campo">
+                        <label class="config-label">Diastólica (mmHg)</label>
+                        <input type="number" id="p-diastolica" placeholder="80" class="campo-input" min="40" max="150">
+                    </div>
+                </div>
+                <div class="form-campo">
+                    <label class="config-label">Observação (opcional)</label>
+                    <input type="text" id="p-obs" placeholder="Ex: após repouso" class="campo-input">
+                </div>
+                <button class="btn-primario btn-coral" onclick="registrarPressao()">
+                    <span class="btn-ico">🩺</span>
+                    <span>Registrar pressão</span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- PAINEL GLICEMIA -->
+        <div id="d-tela-glicemia" class="d-tela" style="display:none">
+
+            <div class="d-metricas">
+                <div class="d-metrica-card" id="d-glicemia-status-card">
+                    <span class="d-metrica-label">Última medição</span>
+                    <span class="d-metrica-val" id="d-glicemia-ultima">-- mg/dL</span>
+                    <span class="d-metrica-badge" id="d-glicemia-badge">—</span>
+                </div>
+                <div class="d-metrica-card">
+                    <span class="d-metrica-label">Registros hoje</span>
+                    <span class="d-metrica-val" id="d-glicemia-hoje">0</span>
+                    <span class="d-metrica-badge d-badge-neutro">medições</span>
+                </div>
+            </div>
+
+            <div class="d-alerta" id="d-alerta-glicemia" style="display:none"></div>
+
+            <div class="d-grafico-wrap">
+                <div class="d-grafico-titulo">Evolução — últimos 7 dias</div>
+                <div class="d-grafico-area">
+                    <canvas id="grafico-glicemia"></canvas>
+                </div>
+            </div>
+
+            <div class="d-historico-header">
+                <span class="d-historico-titulo">Histórico</span>
+                <span class="sec-sub" id="d-glicemia-total">0 registros</span>
+            </div>
+            <div class="d-historico-lista" id="d-glicemia-lista"></div>
+
+            <div class="d-form-card">
+                <div class="d-form-titulo">Registrar medição</div>
+                <div class="form-campo">
+                    <label class="config-label">Glicemia (mg/dL)</label>
+                    <input type="number" id="g-valor" placeholder="100" class="campo-input" min="30" max="600">
+                </div>
+                <div class="config-grupo">
+                    <label class="config-label">Momento</label>
+                    <div class="config-opts">
+                        <button class="config-opt config-opt-on" data-momento="Jejum" onclick="setMomento(this)">Jejum</button>
+                        <button class="config-opt" data-momento="Pós-refeição" onclick="setMomento(this)">Pós-refeição</button>
+                        <button class="config-opt" data-momento="Antes de dormir" onclick="setMomento(this)">Antes de dormir</button>
+                    </div>
+                </div>
+                <div class="form-campo">
+                    <label class="config-label">Observação (opcional)</label>
+                    <input type="text" id="g-obs" placeholder="Ex: antes do almoço" class="campo-input">
+                </div>
+                <button class="btn-primario btn-coral" onclick="registrarGlicemia()">
+                    <span class="btn-ico">🩸</span>
+                    <span>Registrar glicemia</span>
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
 <!-- MODAL: Alerta Água -->
 <div class="modal-overlay" id="modal-alerta-agua">
     <div class="modal-card">
@@ -133,9 +279,7 @@
             <button class="btn-primario btn-azul" onclick="registrarAguaModal()">Bebi agora!</button>
             <button class="btn-secundario" onclick="adiarAguaAlerta()">Lembrar em 10 min</button>
         </div>
-        <div class="aviso-familiar" id="aviso-familiar-agua" style="display:none">
-            ⚠️ Familiar notificado pela demora
-        </div>
+        <div class="aviso-familiar" id="aviso-familiar-agua" style="display:none">⚠️ Familiar notificado pela demora</div>
     </div>
 </div>
 
@@ -154,9 +298,7 @@
             <button class="btn-secundario" onclick="adiarMed()">Adiar 10 minutos</button>
             <button class="btn-pular" onclick="pularMed()">Pular este horário</button>
         </div>
-        <div class="aviso-familiar" id="aviso-familiar-med" style="display:none">
-            ⚠️ Familiar notificado
-        </div>
+        <div class="aviso-familiar" id="aviso-familiar-med" style="display:none">⚠️ Familiar notificado</div>
     </div>
 </div>
 
@@ -239,6 +381,7 @@
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="script.js"></script>
 </body>
 </html>
